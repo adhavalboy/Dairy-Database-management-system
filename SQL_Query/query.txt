@@ -1,0 +1,205 @@
+1. Give a Total milk collected in a year at district level branch according to milk type.
+
+-> SELECT f.branch_name,milk_type,f.y,SUM(total_milk_quantity_village) AS total_milk FROM
+(SELECT * FROM district_level_branch AS d 
+JOIN (SELECT village_branch_id,milk_type,y,total_milk_quantity_village,d_branchid FROM village_level_branch AS v 
+JOIN (SELECT village_branch_id,milk_type, EXTRACT (YEAR FROM m_date) AS y,SUM(quantity) AS total_milk_quantity_village FROM milk NATURAL JOIN milker 
+GROUP BY milk_type,village_branch_id,y
+ORDER BY village_branch_id) AS t ON (t.village_branch_id = v.v_branchid)) AS e ON (d.d_branchid = e.d_branchid)) AS f 
+GROUP BY f.milk_type, f.branch_name,f.y
+ORDER BY f.branch_name; 
+
+2. Give a details about monthly payment given by dairy to milker in year 2016.
+
+-> SELECT m.*,month,year,total_amount FROM (SELECT milker_id, month,year, quantity*price_per_liter AS total_amount FROM 
+(SELECT milker_id,milk_type,EXTRACT (MONTH FROM m_date) as month,EXTRACT (YEAR FROM m_date) AS year,SUM(quantity) as quantity FROM milk
+GROUP BY milk_type,month,year,milker_id 
+ORDER BY milker_id) AS t JOIN milk_price AS p ON (t.milk_type = p.milk_type)) AS d 
+JOIN milker as m ON (d.milker_id = m.milker_id) WHERE(year='2016');
+
+3.  Give a name of district level branch which is not produce anything.
+
+->  SELECT f.branch_name FROM
+(SELECT branch_name,COUNT(product_name) AS no_of_products FROM 
+district_level_branch AS d LEFT OUTER JOIN product AS p ON (d.d_branchid = p.d_branchid)
+GROUP BY branch_name ORDER BY branch_name) AS f
+WHERE(f.no_of_products = 0);
+
+4.  Give female milker name and contact details whose income in 2016 is between 2000 and 2500 $ .
+
+-> SELECT DISTINCT milker_name,contact_details FROM (SELECT milker_id,year, quantity*price_per_liter AS total_amount FROM 
+(SELECT milker_id,milk_type,EXTRACT (YEAR FROM m_date) AS year,SUM(quantity) as quantity FROM milk
+GROUP BY milk_type,year,milker_id 
+ORDER BY milker_id) AS t JOIN milk_price AS p ON (t.milk_type = p.milk_type)) AS d 
+JOIN milker as m ON (d.milker_id = m.milker_id) 
+WHERE(year='2016' AND gender = 'Female' AND total_amount BETWEEN 2000 AND 2500) ;
+
+5.  Give available stock of ‘Paneer’ on ‘01-Feb-2016’ .
+
+-> SELECT (f.q - f.Qty) AS available_stock FROM
+(SELECT SUM(quantity) AS Qty, t.q FROM 
+product_supply_details AS p JOIN
+(SELECT m.batch_id,SUM(quantity) AS q FROM manufacturing_details AS m NATURAL JOIN product 
+WHERE(product_name = 'Paneer' AND man_date BETWEEN '01-01-2016' AND '01-02-2016') 
+GROUP BY m.batch_id) AS t ON (p.batch_id = t.batch_id)
+WHERE(supply_date BETWEEN '01-01-2016' AND '01-02-2016')
+GROUP BY t.q) AS f;
+
+
+6. Most Valuable product for the Dairy in ‘April-2016’.
+
+-> SELECT * FROM
+product AS p NATURAL JOIN
+(SELECT batch_id,(revenue - (man_cost*quantity)) AS benefit FROM
+manufacturing_details AS m NATURAL JOIN
+(SELECT batch_id, (quantity*sale_price) AS revenue,EXTRACT (MONTH FROM supply_date) AS month FROM 
+product_supply_details) AS d WHERE(month='4')) AS f WHERE(benefit IN (SELECT MAX(benefit) AS benefit FROM
+product AS p NATURAL JOIN
+(SELECT batch_id,(revenue - (man_cost*quantity)) AS benefit FROM
+manufacturing_details AS m NATURAL JOIN
+(SELECT batch_id, (quantity*sale_price) AS revenue,EXTRACT (MONTH FROM supply_date) AS month FROM 
+product_supply_details) AS d WHERE(month='4')) AS f));
+
+
+
+7. Which district level branch is produce more profit by selling products in ‘2016’ ?
+
+-> SELECT * FROM
+district_level_branch AS d NATURAL JOIN
+(SELECT d_branchid,SUM(benefit) AS profit FROM
+product AS p NATURAL JOIN
+(SELECT batch_id,(revenue - (man_cost*quantity)) AS benefit FROM
+manufacturing_details AS m NATURAL JOIN
+(SELECT batch_id, (quantity*sale_price) AS revenue,EXTRACT (YEAR FROM supply_date) AS year FROM 
+product_supply_details) AS d WHERE(year='2016')) AS f
+GROUP BY d_branchid 
+ORDER BY profit DESC) AS v
+ LIMIT 1;
+
+
+8. Give all details of employee who are manager at village level branch and also a director at district level branch.
+
+-> SELECT e.* FROM
+employee AS e JOIN 
+(SELECT * FROM district_level_branch WHERE(director_id IN (SELECT manager_id FROM village_level_branch))) AS v
+ON (e.employee_id = v.director_id)
+
+
+9.print name and salary of all the Director
+->select employee_id,f_name,l_name,salary from employee join district_level_branch on( employee_id=director_id);
+
+ /*SPL*/
+
+1)
+
+CREATE Table ANS(Product varchar(20));
+CREATE OR REPLACE FUNCTION Life_Time_Prod() returns setof ANS AS
+$BODY$
+DECLARE
+	A ANS;
+	m_date DATE;
+	e_date DATE;
+	Day integer;
+	S record;
+BEGIN
+	FOR S in select * from Manufacturing_Details Natural Join Product
+	LOOP
+		select DATEDIFF(day,S.manufacturing_Date,S.Expiry_Date) as Day;
+		IF DAY>=120 then
+			A.Product=S.Productname;
+			RETURN NEXT A;
+		END IF;
+	END LOOP;
+	RETURN;
+END $BODY$ LANGUAGE 'plpgsql';
+
+
+
+
+2) 
+
+CREATE TABLE ANS (Milk_type varchar(20), Amount integer);
+CREATE OR REPLACE FUNCTION Total_Milk(village_id integer,d1 DATE,d2 DATE) returns setof ANS AS
+$BODY$
+DECLARE
+	A ANS;
+	c Milk.Milk_type%type;
+	g Milk.Milk_type%type;
+	r Milk.Milk_type%type;
+	ca Milk.Milk_type%type;
+	b Milk.milk_type%type;
+	P record;
+	S record;
+	
+BEGIN
+	c:= 0;
+	g:= 0;
+	r:= 0;
+	ca:= 0;
+	b:= 0;
+	
+	FOR S in SELECT * from Milk as m1 NATURAL JOIN Milker as m2 where m2.Village_Branch_ID=village_id
+	LOOP
+		IF S.m_date BETWEEN d1 AND d2 then
+			IF S.milk_type='cow' then
+				c:=c+m1.Quantity;
+			ELSEIF S.milk_type='goat' then
+				g:=g+m1.Quantity;
+			ELSEIF S.milk_type='sheep' then
+				r:=r+m1.Quantity;
+			ELSEIF S.milk_type='camel' then
+				ca:=ca+m1.Quantity;
+			ELSEIF S.milk_type='buffalo' then
+				b:=b+m1.Quantity;
+			END IF;
+		END IF;
+	END LOOP;
+	
+	FOR P in SELECT * FROM milk_price 
+	LOOP 
+			IF P.milk_type='cow' then
+				A.Milk_type=P.Milk_type;
+				A.Amount=c;
+			ELSEIF P.milk_type='goat' then
+				A.milk_type=P.milk_type;
+				A.Amount=g;
+			ELSEIF P.milk_type='sheep' then
+				A.milk_type=P.milk_type;
+				A.Amount=s;
+			ELSEIF P.milk_type='camel' then
+				A.milk_type=P.milk_type;
+				A.Amount=ca;
+			ELSEIF P.milk_type='buffalo' then
+				A.milk_type=P.milk_type;
+				A.Amount=b;
+			END IF;
+			RETURN NEXT A;
+	END LOOP;
+	RETURN;
+END $BODY$ LANGUAGE 'plpgsql';
+
+
+CREATE function process() returns Trigger as 
+$ SALE_UPDATE $
+BEGIN
+	IF TG_OP='INSERT' then
+		UPDATE Manufacturing_Details set Quantity = Quantity-NEW.Quantity 
+		WHERE(NEW.Batch_ID = Manufacturing_Details.Batch_ID);
+	ELSIF TG_OP='DELETE' then	
+		UPDATE Manufacturing_Details set Quantity = Quantity+OLD.Quantity 
+		WHERE(OLD.Batch_ID = Manufacturing_Details.Batch_ID);
+	ELSIF TG_OP='UPDATE' then	
+		IF(OLD.Quantity > NEW.Quantity) then
+			UPDATE Manufacturing_Details set Quantity = Quantity+(OLD.Quantity-NEW.Quantity) 
+			WHERE(OLD.Batch_ID = Manufacturing_Details.Batch_ID);
+		ELSE
+			UPDATE Manufacturing_Details set Quantity = Quantity-(NEW.Quantity-OLD.Quantity) 
+			WHERE(OLD.Batch_ID = Manufacturing_Details.Batch_ID);
+		END IF;
+	END IF;
+END;
+$ SALE_UPDATE $  LANGUAGE 'plpgsql';
+
+CREATE TRIGGER SALE_UPDATE 
+AFTER INSERT OR UPDATE OR DELETE ON Product_supply_Details 
+for each row execute procedure process();
