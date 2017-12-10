@@ -1,0 +1,15 @@
+insert into product (batch_id, product_name, d_branchid) values (702, 'Buttermilk', 1);
+insert into product (batch_id, product_name, d_branchid) values (118, 'Curd', 11);
+insert into product (batch_id, product_name, d_branchid) values (287, 'Milk', 12);
+insert into product (batch_id, product_name, d_branchid) values (799, 'Paneer', 3);
+insert into product (batch_id, product_name, d_branchid) values (852, 'Cheese', 14);
+insert into product (batch_id, product_name, d_branchid) values (411, 'Lassi', 8);
+insert into product (batch_id, product_name, d_branchid) values (811, 'Yoghurt', 7);
+insert into product (batch_id, product_name, d_branchid) values (367, 'Ghee', 11);
+insert into product (batch_id, product_name, d_branchid) values (194, 'Peda', 15);
+insert into product (batch_id, product_name, d_branchid) values (557, 'Pesturised Milk', 13);
+insert into product (batch_id, product_name, d_branchid) values (843, 'Creame', 14);
+insert into product (batch_id, product_name, d_branchid) values (214, 'Custard', 13);
+insert into product (batch_id, product_name, d_branchid) values (554, 'Ice-Cream', 15);
+insert into product (batch_id, product_name, d_branchid) values (373, 'Shrikhand', 8);
+insert into product (batch_id, product_name, d_branchid) values (953, 'Skim Milk', 7);

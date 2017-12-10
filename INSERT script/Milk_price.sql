@@ -1,0 +1,5 @@
+insert into Milk_price (milk_type,price_per_liter) values ('cow',25.00)
+insert into Milk_price (milk_type,price_per_liter) values ('goat',24.00)
+insert into Milk_price (milk_type,price_per_liter) values ('sheep',25.25)
+insert into Milk_price (milk_type,price_per_liter) values ('camel',27.50)
+insert into Milk_price (milk_type,price_per_liter) values ('buffalo',29.00)

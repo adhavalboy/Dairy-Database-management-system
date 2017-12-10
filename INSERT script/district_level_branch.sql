@@ -1,0 +1,15 @@
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (1, 'Mehsana', '488 Garrison Pass', '7692493110', 347);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (2, 'Patan', '8954 Blaine Point', '3233076966', 592);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (3, 'Viramgam', '4 Hanover Center', '6519096265', 314);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (5, 'Ahmedabad', '07 Grover Center', '9759738041', 268);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (6, 'Rajkot', '77098 Fieldstone Center', '7911744402', 427);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (7, 'Surat', '3689 Columbus Road', '7771694121', 4);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (8, 'Bharuch', '14 Hintze Place', '8717066869', 601);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (10, 'Jetpur', '686 Becker Trail', '7353431936', 405);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (11, 'Jamnagar', '03 Shelley Junction', '6329948368', 657);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (12, 'Rampur', '0 Summit Pass', '6802933217', 640);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (13, 'Ratanpur', '163 Moose Circle', '7589710505', 314);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (14, 'Diu', '42223 Hauk Terrace', '8051846204', 248);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (15, 'Daman', '098 Sunnyside Junction', '1875726279', 408);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (9, 'Bhuj', '515 Scoville Junction', '6796643105', 164);
+insert into district_level_branch (d_branchid, branch_name, address, contact_details, director_id) values (4, 'Dang', '42 South Street', '7949145826', 261);
